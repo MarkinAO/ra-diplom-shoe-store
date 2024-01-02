@@ -1,19 +1,25 @@
 import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
-import type { itemOfCart } from './model';
+import type { itemOfCart, order } from './model';
 
 export interface CartState {
   products: itemOfCart[]
   count: number
+  load: boolean
+  error: string
+  orderComplete: boolean
 }
 
 const initialState: CartState = {
     products: [],
     count: 0,
+    load: false,
+    error: '',
+    orderComplete: false
 }
 
 export const CartSlice = createSlice({
-  name: 'Cart',
+  name: 'cart',
   initialState,
   reducers: {    
     addProduct: (state, action: PayloadAction<itemOfCart>) => {
@@ -33,16 +39,31 @@ export const CartSlice = createSlice({
         
         state.products = newArr;
         state.count = state.count + action.payload.count;
-    },    
+    },
+    setCartData: (state, action: PayloadAction<itemOfCart[]>) => {        
+        state.count = action.payload.length;
+        state.products = [...action.payload];
+    },
     deleteProduct: (state, action: PayloadAction<number>) => {
         const deleteCount = state.products.filter(prod => prod.product.id === action.payload)[0].count;
         state.count = state.count - deleteCount;
         state.products = state.products.filter(prod => prod.product.id !== action.payload);
-    }
+    },
+    sendOrder: (state, action: PayloadAction<order>) => {
+        state.load = true
+    },
+    orderComplete: (state) => {
+        state.load = false
+        state.orderComplete = true
+    },
+    setError: (state, action: PayloadAction<string>) => {
+        state.load = false
+        state.error = action.payload
+    },
   },
 })
 
 // Action creators are generated for each case reducer function
-export const { addProduct, deleteProduct } = CartSlice.actions
+export const { addProduct, deleteProduct, setCartData, sendOrder, orderComplete, setError } = CartSlice.actions
 
 export default CartSlice.reducer

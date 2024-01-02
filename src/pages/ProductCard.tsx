@@ -100,7 +100,7 @@ export default function ProductCard() {
                                 className="btn btn-danger btn-block btn-lg"
                                 onClick={() => {
                                     if(!activeSize) return;
-                                    dispatch(addProduct({product, count, size: activeSize}));
+                                    dispatch(addProduct({product, count, size: activeSize}));                                    
                                     navigate('/Cart');
                                 }}
                             >В корзину</button>

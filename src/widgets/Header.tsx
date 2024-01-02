@@ -1,11 +1,20 @@
 import { Link, NavLink } from "react-router-dom";
 import logo from "../assets/header-logo.png";
 import HeaderSearch from "./HeaderSearch";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../shared/model/store";
+import { useEffect } from "react";
+import { getCart } from "../shared/api/localStorageManager";
+import { setCartData } from "../shared/model/cartSlice";
 
 export default function Header() {
     const { count } = useSelector((state: RootState) => state.cart);
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        const data = getCart();
+        if(data) dispatch(setCartData(data));
+    }, [])
 
     return(
         <header className="container">

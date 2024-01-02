@@ -36,3 +36,9 @@ export type itemOfCart = {
     size: string
     count: number
 }
+
+export type order = {
+    phone: string
+    address: string
+    items: itemOfCart[]
+}

@@ -5,10 +5,10 @@ import { setHits, setError as setHitsError } from "./hitsSlice";
 import { setProducts, setMoreProducts, setError as setProductError } from "./productsSlice";
 import { setCategories, setError as setCategoriesError } from "./categoriesSlice";
 import { setProductCard, setError as setProductCardError } from "./productCardSlice";
-import { setProduct } from "./cartSlice";
-import type { itemOfCart } from "./model";
-const URL = import.meta.env.VITE_URL_API;
+import { orderComplete, setError as setSendOrderError } from "./cartSlice";
+import type { order } from "./model";
 
+const URL = import.meta.env.VITE_URL_API;
 const count = Infinity;
 const delay = 1000;
 
@@ -79,6 +79,15 @@ function* handleGetSearchSaga(action: PayloadAction<string>): Generator {
     }
 }
 
+function* handleSendOrderSaga(action: PayloadAction<order>): Generator {    
+    try {
+        yield retry(count, delay, sendQueryOfOrder, action.payload);
+        yield put(orderComplete());
+    } catch (error: any) {
+        yield put(setSendOrderError(error?.message));
+    }
+}
+
 function* watchGetHitsSaga() {
     yield takeLatest("hits/getHits", () => handleGetProductsSaga(setHits, setHitsError, 'top-sales'))
 }
@@ -107,13 +116,36 @@ function* watchGetSearchSaga() {
     yield takeLatest("products/getSearch", handleGetSearchSaga)
 }
 
-export async function getData(queryString?: string) {    
+function* watchSendOrderSaga() {    
+    yield takeLatest("cart/sendOrder", handleSendOrderSaga)
+}
+
+async function getData(queryString?: string) {    
     const url = URL + queryString;
     return await axios.get(url).then(res => {                
                         if(res.status === 200) {
                             return res.data
                         }
                     })    
+}
+
+async function sendQueryOfOrder(orderData: order) {
+    const items = orderData.items.map(prod => {
+        return {id: prod.product.id, price: prod.product.price, count: prod.count, size: prod.size}
+    })
+    const order = {
+        "owner": {
+            "phone": orderData.phone,
+            "address": orderData.address,
+          },
+          "items": items
+    }    
+    const url = URL + 'order';    
+    return await axios.post(url, order).then(res => {
+        if(res.statusText === 'OK') {
+            return res.status
+        }
+    })
 }
 
 export function* sagas() {
@@ -123,5 +155,6 @@ export function* sagas() {
     yield spawn(watchGetCategoriesSaga);
     yield spawn(watchSetActiveCategorySaga);
     yield spawn(watchGetProductCardSaga);
-    yield spawn(watchGetSearchSaga);    
+    yield spawn(watchGetSearchSaga);
+    yield spawn(watchSendOrderSaga);
 }

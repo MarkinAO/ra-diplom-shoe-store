@@ -3,10 +3,11 @@
 
 #root {
   margin: 0 auto;
+  align-self: flex-start;
 }
 
 body {
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Roboto', sans-serif;  
 }
 
 a {
@@ -180,6 +181,7 @@ section {
 
 .catalog-item-card {
   margin-bottom: 1em;
+  max-height: 460px;
 }
 
 .catalog-item-size {

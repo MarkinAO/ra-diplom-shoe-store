@@ -2,14 +2,14 @@ import axios from "axios";
 import { put, retry, select, spawn, takeLatest } from "redux-saga/effects";
 import { PayloadAction } from '@reduxjs/toolkit';
 import { setHits, setError as setHitsError } from "./hitsSlice";
-import { setProducts, setMoreProducts, setError as setProductError } from "./productsSlice";
+import { setProducts, setMoreProducts, setLoad, disableLoad, setError as setProductError, setMoreError } from "./productsSlice";
 import { setCategories, setError as setCategoriesError } from "./categoriesSlice";
 import { setProductCard, setError as setProductCardError } from "./productCardSlice";
 import { orderComplete, setError as setSendOrderError } from "./cartSlice";
 import type { order } from "./model";
 
 const URL = import.meta.env.VITE_URL_API;
-const count = Infinity;
+const count = 3;
 const delay = 1000;
 
 function* handleGetProductsSaga(setData: Function, setError: Function, url: string): Generator {    
@@ -31,15 +31,17 @@ function* handleGetCategoriesSaga(): Generator {
 }
 
 function* handleSetActiveCategorySaga(): Generator {    
-    try {        
+    try {
+        yield put(setLoad());
         const activeCategory = yield select((state) => state.categories.activeCategory);
         const searchQuery = yield select((state) => state.products.searchQuery);
         let query = `items?categoryId=${activeCategory}`;
-        if(searchQuery) query += `&q=${searchQuery}`;        
+        if(searchQuery) query += `&q=${searchQuery}`;
         const data = yield retry(count, delay, getData, query);
         yield put(setProducts(data));
     } catch (error: any) {
-        yield put(setCategoriesError(error?.message));
+        yield put(setProductError(error?.message));
+        yield put(disableLoad());
     }
 }
 
@@ -54,7 +56,7 @@ function* handleGetMoreProductsSaga(): Generator {
         const data = yield retry(count, delay, getData, query);
         yield put(setMoreProducts(data));
     } catch (error: any) {
-        yield put(setProductError(error?.message));
+        yield put(setMoreError(error?.message));
     }
 }
 
@@ -68,7 +70,8 @@ function* handleGetProductCardSaga(action: PayloadAction<string>): Generator {
 }
 
 function* handleGetSearchSaga(action: PayloadAction<string>): Generator {    
-    try {        
+    try {
+        yield put(setLoad());
         const activeCategory = yield select((state) => state.categories.activeCategory);
         let query = 'items?q=' + action.payload;
         if(activeCategory !== 0) query += `&categoryId=${activeCategory}`;

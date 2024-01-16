@@ -38,7 +38,7 @@ export const CartSlice = createSlice({
         }
         
         state.products = newArr;
-        state.count = state.count + action.payload.count;
+        state.count = newArr.length;
     },
     setCartData: (state, action: PayloadAction<itemOfCart[]>) => {        
         state.count = action.payload.length;
@@ -51,6 +51,7 @@ export const CartSlice = createSlice({
     },
     sendOrder: (state, action: PayloadAction<order>) => {
         state.load = true
+        state.error = ''
     },
     orderComplete: (state) => {
         state.load = false

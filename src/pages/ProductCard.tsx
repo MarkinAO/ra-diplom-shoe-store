@@ -5,21 +5,26 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Loader from "../shared/ui/Loader";
 import { addProduct } from "../shared/model/cartSlice";
+import ErrorButton from "../shared/ui/ErrorButton";
 
 export default function ProductCard() {
-    const { product, load } = useSelector((state: RootState) => state.productCard);
+    const { product, load, error } = useSelector((state: RootState) => state.productCard);
     const dispatch = useDispatch();
     const { id } = useParams();
     const [count, setCount] = useState(1);
     const [activeSize, setActiveSize] = useState('');
     const navigate = useNavigate();
+    const getData = (id: string) => {
+        dispatch(getProductCard(id))
+    }
 
     useEffect(() => {
-        id && dispatch(getProductCard(id))
+        id && getData(id)
     }, [])
 
     return(
         <>
+            {<ErrorButton onClickHandler={getData} errorMessage={error} props={id} />}
             {load && <Loader />}
             {!load &&
             <section className="catalog-item">
@@ -95,7 +100,7 @@ export default function ProductCard() {
                                 </p>
                             }
                         </div>
-                        {product?.sizes && product?.sizes.length > 0 &&
+                        {product?.sizes && product?.sizes?.length > 0 &&
                             <button 
                                 className="btn btn-danger btn-block btn-lg"
                                 onClick={() => {

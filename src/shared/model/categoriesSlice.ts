@@ -21,6 +21,7 @@ export const categoriesSlice = createSlice({
   reducers: {    
     getCategories: (state) => {
         state.load = true
+        state.error = ''
     },
     setCategories: (state, action: PayloadAction<category[]>) => {
         state.load = false
@@ -31,6 +32,7 @@ export const categoriesSlice = createSlice({
     },
     setError: (state, action: PayloadAction<string>) => {
         state.error = action.payload
+        state.load = false
     },
   },
 })

@@ -18,6 +18,7 @@ export const productCardSlice = createSlice({
   reducers: {    
     getProductCard: (state, action: PayloadAction<string>) => {
         state.load = true;
+        state.error = ''
     },
     setProductCard: (state, action: PayloadAction<productCard>) => {
         state.load = false;
@@ -25,6 +26,7 @@ export const productCardSlice = createSlice({
     },    
     setError: (state, action: PayloadAction<string>) => {
         state.error = action.payload
+        state.load = false
     }
   },
 })

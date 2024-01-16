@@ -19,6 +19,7 @@ export const hitsSlice = createSlice({
   reducers: {    
     getHits: (state) => {
         state.load = true
+        state.error = ''
     },
     setHits: (state, action: PayloadAction<product[]>) => {
         state.load = false
@@ -26,6 +27,7 @@ export const hitsSlice = createSlice({
     },
     setError: (state, action: PayloadAction<string>) => {
         state.error = action.payload
+        state.load = false
     }
   },
 })

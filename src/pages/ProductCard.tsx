@@ -23,8 +23,7 @@ export default function ProductCard() {
     }, [])
 
     return(
-        <>
-            {<ErrorButton onClickHandler={getData} errorMessage={error} props={id} />}
+        <>            
             {load && <Loader />}
             {!load &&
             <section className="catalog-item">
@@ -32,6 +31,7 @@ export default function ProductCard() {
                 <div className="row">
                     <div className="col-5">
                         <img src={product?.images[0]} className="img-fluid" alt={product?.title} />
+                        {error && <ErrorButton onClickHandler={getData} errorMessage={error} props={id} />}
                     </div>
                     <div className="col-7">
                         <table className="table table-bordered">
@@ -102,7 +102,7 @@ export default function ProductCard() {
                         </div>
                         {product?.sizes && product?.sizes?.length > 0 &&
                             <button 
-                                className="btn btn-danger btn-block btn-lg"
+                                className={activeSize ? "btn btn-danger btn-block btn-lg" : "btn btn-disabled btn-block btn-lg"}
                                 onClick={() => {
                                     if(!activeSize) return;
                                     dispatch(addProduct({product, count, size: activeSize}));                                    
@@ -113,7 +113,7 @@ export default function ProductCard() {
                     </div>
                 </div>
             </section>
-            }
+            }            
         </>        
     )
 }
